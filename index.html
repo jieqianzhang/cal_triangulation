@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Triangulation</title>
+</head>
+<style>
+body {
+    background-color: rgba(0,0,0,.9);
+  
+}
+
+path{
+  fill:rgba(211,211,211, .1) !important;
+/*  fill:white !important;
+*/  stroke-width:1px;
+}
+
+#graphic{
+  margin-top: 50px;
+  margin-left: 20px;
+}
+
+</style>
+
+<body>
+    <div id="graphic"></div>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="shapes.js"></script>
+    <script>
+
+    
+    var w = 800;
+    var h = 600;
+
+
+    var svg = d3.select("#graphic")
+        .append("svg")
+        .attr("width", w)
+        .attr("height", h)
+        .call(responsivefy)
+        .attr("class", "svg-wrapper");
+
+    var first = shapesTwo["bear"]
+    var second = shapesTwo["cal"]
+
+    svg.append("g")
+        .selectAll("path")
+        .data(first)
+        .enter().append("path")
+        .attr("d", function(d, i) {
+            var newCoor = [];
+            d.triangle.forEach(function(item) {
+                var element = item.map(function(num) {
+                    return Math.floor(num);
+                });
+
+                newCoor.push(element);
+            });
+            return "M" + newCoor.join("L") + "Z";
+        })
+        .attr("fill", function(d) {
+            return d.color;
+        })
+        .attr("stroke", "#adadad")
+        .attr("stroke-width", 0.5)
+        .style("opacity", 0.9);
+
+
+    var one = function changeOne() {
+
+
+        var img = svg.selectAll("path")
+            .data(second)
+
+
+        img.enter()
+            .append("path");
+
+
+        img.transition()
+            .delay(function(d, i) {
+                return 400 + i * 1;
+            })
+            .duration(200)
+            .ease("cubic-in-out")
+            .attr("d", function(d, i) {
+                var newCoor = [];
+                d.triangle.forEach(function(item) {
+                    var element = item.map(function(num) {
+                        return Math.floor(num);
+                    });
+
+                    newCoor.push(element);
+                });
+                return "M" + newCoor.join("L") + "Z";
+            })
+            .attr("fill", function(d) {
+                return d.color;
+            })
+            .attr("stroke", "#adadad")
+            .attr("stroke-width", 0.5);
+
+
+
+
+    };
+
+
+    var two = function changeTwo() {
+
+
+        var img = svg.selectAll("path")
+            .data(first)
+
+
+        img.exit()
+            .transition()
+            .delay(function(d, i) {
+                return i * 1;
+            })
+            .remove();
+
+
+        img.transition()
+            .delay(function(d, i) {
+                return 400 + i * 1;
+            })
+            .duration(200)
+            .ease("cubic-in-out")
+            .attr("d", function(d, i) {
+                var newCoor = [];
+                d.triangle.forEach(function(item) {
+                    var element = item.map(function(num) {
+                        return Math.floor(num);
+                    });
+
+                    newCoor.push(element);
+                });
+                return "M" + newCoor.join("L") + "Z";
+            })
+            .attr("fill", function(d) {
+                return d.color;
+            })
+            .attr("stroke", "#adadad")
+            .attr("stroke-width", 0.5);
+    };
+
+    var intervalFunctions = [two, one];
+    var intervalIndex = 0 
+    window.setInterval(function(){
+      intervalFunctions[intervalIndex++ % intervalFunctions.length]();
+}, 1000);
+    
+
+
+
+
+
+
+    function responsivefy(svg) {
+
+        var container = d3.select(svg.node().parentNode),
+            width = parseInt(svg.style("width")),
+            height = parseInt(svg.style("height")),
+            aspect = width / height;
+
+        svg.attr("viewBox", "0 0 " + width + " " + height)
+            .attr("perserveAspectRatio", "xMinYMid")
+            .call(resize);
+
+        d3.select(window).on("resize." + container.attr("#graphic"), resize);
+
+        function resize() {
+            var targetWidth = parseInt(container.style("width"));
+            svg.attr("width", targetWidth);
+            svg.attr("height", Math.round(targetWidth / aspect));
+        }
+    }
+    </script>
+</body>
